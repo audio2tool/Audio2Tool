@@ -1,0 +1,91 @@
+# Audio2Tool Benchmark - Example Configuration
+#
+# Update `data_dir`, `tools_file`, and `results_dir` to point at your local
+# copy of the Audio2Tool dataset release before running:
+#
+#   python audio_benchmark/run_benchmark.py --config configs/example_config.yaml
+#
+# For local GPU models, use the multi-GPU runner:
+#   python audio_benchmark/run_benchmark_multigpu.py --config configs/example_config.yaml --num-gpus 8
+#
+# Supported models (see audio_benchmark/models/ for details):
+#   - qwen2-audio:          Qwen2-Audio-7B-Instruct (local, ~14GB bf16)
+#   - qwen3-omni:           Qwen3-Omni-30B-A3B-Instruct MoE (local, 2+ GPUs)
+#   - qwen3-omni-vllm:      Qwen3-Omni via external vLLM server(s)
+#   - kimi-audio-vllm:      Kimi-Audio-7B via external OpenAI-compatible server(s)
+#   - whisper-qwen3-vllm:   Cascaded Whisper ASR -> Qwen3 (text) via vLLM
+#   - whisper-gemma3-vllm:  Cascaded Whisper ASR -> Gemma3 (text) via vLLM
+#   - step-audio-2-vllm:    Step-Audio-2-mini via external vLLM server
+#   - audio-flamingo3-vllm: Audio Flamingo 3 (NVIDIA) via external vLLM server(s)
+
+models:
+  - name: qwen2-audio
+    model_path: Qwen/Qwen2-Audio-7B-Instruct
+    torch_dtype: bfloat16
+
+datasets:
+  - name: tier1
+    data_dir: /path/to/Audio2ToolDataset/public/tier1_direct
+    max_samples: null      # set to a small number (e.g. 10) for a quick test
+    speakers_per_query: 1
+
+  # - name: tier2
+  #   data_dir: /path/to/Audio2ToolDataset/public/tier2_parametric
+  #   max_samples: null
+  #   speakers_per_query: 1
+
+  # - name: tier3
+  #   data_dir: /path/to/Audio2ToolDataset/public/tier3_multi_intent
+  #   max_samples: null
+  #   speakers_per_query: 1
+
+  # - name: tier4
+  #   data_dir: /path/to/Audio2ToolDataset/public/tier4_implicit
+  #   max_samples: null
+  #   speakers_per_query: 1
+
+  # - name: tier5
+  #   data_dir: /path/to/Audio2ToolDataset/public/tier5_needle
+  #   max_samples: null
+  #   speakers_per_query: 1
+
+  # - name: tier6
+  #   data_dir: /path/to/Audio2ToolDataset/public/tier6_correction
+  #   max_samples: null
+  #   speakers_per_query: 1
+
+  # - name: tier7
+  #   data_dir: /path/to/Audio2ToolDataset/public/tier7_multiturn
+  #   max_samples: null
+  #   speakers_per_query: 1
+
+  # - name: tier8
+  #   data_dir: /path/to/Audio2ToolDataset/public/tier8_intent_blending
+  #   max_samples: null
+  #   speakers_per_query: 1
+
+# Output
+results_dir: results
+max_speakers_per_query: 1
+save_raw_outputs: true
+continue_on_error: true
+
+# Parallelism (for vLLM-based models)
+num_workers: 4
+
+# Generation
+max_new_tokens: 256
+do_sample: false
+temperature: 1.0
+seed: 42
+
+# Tools taxonomy CSV (loaded at runtime, injected into system prompt + OpenAI tools)
+tools_file: /path/to/Audio2ToolDataset/tools_registry.csv
+
+system_prompt: |
+  You are an AI assistant that converts voice commands into tool calls.
+  Listen to the audio and determine which tool should be called.
+  Output ONLY the tool call in the format: tool_name(param1=value1, param2=value2).
+  If no parameters are mentioned, output: tool_name().
+
+log_level: INFO

@@ -19,19 +19,39 @@ pip install -r requirements.txt
 
 ## Dataset
 
-The benchmark runs on the Audio2Tool dataset release, which contains tiered
-audio tool-calling queries (`tier1_direct`, `tier2_parametric`,
-`tier3_multi_intent`, `tier4_implicit`, `tier5_needle`, `tier6_correction`,
-`tier7_multiturn`, `tier8_intent_blending`) and a `tools_registry.csv`
-describing the tool taxonomy. Point the config entries `data_dir` and
-`tools_file` at your local copy of the dataset.
+The benchmark runs on the public [Audio2Tool dataset](https://huggingface.co/datasets/RVtech/Audio2Tool),
+which contains tiered audio tool-calling queries (`tier1_direct`,
+`tier2_parametric`, `tier3_multi_intent`, `tier4_implicit`, `tier5_needle`,
+`tier6_correction`, `tier7_multiturn`, `tier8_intent_blending`) and a
+`tools_registry.csv` describing the tool taxonomy.
+
+Download it into `./data/Audio2Tool` (the path used by the example config):
+
+```bash
+hf download RVtech/Audio2Tool --repo-type dataset --local-dir ./data/Audio2Tool
+```
+
+If you already have a local copy, just point `data_dir` and `tools_file` in
+the config at it instead. Each tier directory contains a `metadata.jsonl`
+and an `audio/` folder; the built-in `release` dataset loader reads this
+layout directly for every tier.
 
 ## Quick Start
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Download the dataset
+hf download RVtech/Audio2Tool --repo-type dataset --local-dir ./data/Audio2Tool
+
+# 3. Run the benchmark (edit configs/example_config.yaml to pick models/tiers)
+python audio_benchmark/run_benchmark.py --config configs/example_config.yaml
+```
 
 ### Using Configuration File
 
 ```bash
-# Edit configs/example_config.yaml first (dataset paths, model selection)
 python audio_benchmark/run_benchmark.py --config configs/example_config.yaml
 
 # Multi-GPU (for locally hosted models)
@@ -44,21 +64,21 @@ python audio_benchmark/run_benchmark_multigpu.py --config configs/example_config
 # Single model evaluation
 python audio_benchmark/run_benchmark.py \
     --model qwen2-audio \
-    --dataset tier1 \
-    --data-dir /path/to/Audio2ToolDataset/public/tier1_direct \
+    --dataset release \
+    --data-dir ./data/Audio2Tool/public/tier1_direct \
     --max-samples 100
 
 # Multiple models
 python audio_benchmark/run_benchmark.py \
     --models qwen2-audio kimi-audio \
-    --dataset tier1 \
-    --data-dir /path/to/Audio2ToolDataset/public/tier1_direct
+    --dataset release \
+    --data-dir ./data/Audio2Tool/public/tier1_direct
 
 # Filter by domain
 python audio_benchmark/run_benchmark.py \
     --model qwen2-audio \
-    --dataset tier1 \
-    --data-dir /path/to/Audio2ToolDataset/public/tier1_direct \
+    --dataset release \
+    --data-dir ./data/Audio2Tool/public/tier1_direct \
     --filter-domain smart_car
 
 # List available models and datasets
@@ -75,8 +95,8 @@ model = get_model("qwen2-audio", device="cuda")
 
 # Initialize and load dataset
 dataset = get_dataset(
-    "tier1",
-    data_dir="/path/to/Audio2ToolDataset/public/tier1_direct",
+    "release",
+    data_dir="./data/Audio2Tool/public/tier1_direct",
     max_samples=100
 )
 dataset.load()
@@ -114,16 +134,23 @@ for server launch instructions.
 
 ## Available Datasets
 
-| Dataset | Description |
-|---------|-------------|
-| `tier1` | Direct tool calling queries |
-| `tier2` | Parametric queries |
-| `tier3` | Multi-intent queries |
-| `tier4` | Implicit intent queries |
-| `tier5` | Needle-in-haystack (long context) |
-| `tier6` | Self-correction queries |
-| `tier7` | Multi-turn conversational queries |
-| `tier8` | Intent blending queries |
+Use the **`release`** loader for the public dataset — it reads every tier of
+the [HuggingFace release](https://huggingface.co/datasets/RVtech/Audio2Tool)
+(`metadata.jsonl` + `audio/`). Point `data_dir` at the tier directory:
+
+| Tier directory | Description |
+|----------------|-------------|
+| `public/tier1_direct` | Direct tool calling queries |
+| `public/tier2_parametric` | Parametric queries |
+| `public/tier3_multi_intent` | Multi-intent queries |
+| `public/tier4_implicit` | Implicit intent queries |
+| `public/tier5_needle` | Needle-in-haystack (long context) |
+| `public/tier6_correction` | Self-correction queries |
+| `public/tier7_multiturn` | Multi-turn conversational queries |
+| `public/tier8_intent_blending` | Intent blending (mixed-speaker audio) |
+
+The legacy `tier1`–`tier11` loaders remain available for the internal
+per-query folder format.
 
 ## Adding New Models
 
@@ -239,7 +266,7 @@ temperature: 1.0
 system_prompt: null  # Uses default if null
 log_level: INFO
 
-tools_file: /path/to/Audio2ToolDataset/tools_registry.csv
+tools_file: ./data/Audio2Tool/tools_registry.csv
 ```
 
 ## License

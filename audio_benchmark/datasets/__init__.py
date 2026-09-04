@@ -6,6 +6,8 @@ To add support for a new dataset format, create a class inheriting
 from BaseDataset and register it using the @register_dataset decorator.
 
 Available Datasets:
+- release: Any tier of the public Audio2Tool dataset release
+  (https://huggingface.co/datasets/RVtech/Audio2Tool) — recommended
 - tier1: Direct tool calling queries (4,560 samples)
 - tier2: Parametric queries with additional tool calls (4,560 samples)
 - tier3: Multi-intent queries with multiple tools (4,560 samples)
@@ -37,6 +39,7 @@ from .tier8_dataset import Tier8Dataset
 from .tier9_dataset import Tier9Dataset
 from .tier10_dataset import Tier10Dataset
 from .tier11_dataset import Tier11Dataset
+from .release_dataset import ReleaseDataset
 
 __all__ = [
     'BaseDataset',
@@ -56,4 +59,5 @@ __all__ = [
     'Tier9Dataset',
     'Tier10Dataset',
     'Tier11Dataset',
+    'ReleaseDataset',
 ]

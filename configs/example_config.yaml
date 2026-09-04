@@ -1,9 +1,9 @@
 # Audio2Tool Benchmark - Example Configuration
 #
-# Update `data_dir`, `tools_file`, and `results_dir` to point at your local
-# copy of the Audio2Tool dataset release before running:
-#
-#   python audio_benchmark/run_benchmark.py --config configs/example_config.yaml
+# 1. Download the dataset (or use a local copy):
+#      hf download RVtech/Audio2Tool --repo-type dataset --local-dir ./data/Audio2Tool
+# 2. Run:
+#      python audio_benchmark/run_benchmark.py --config configs/example_config.yaml
 #
 # For local GPU models, use the multi-GPU runner:
 #   python audio_benchmark/run_benchmark_multigpu.py --config configs/example_config.yaml --num-gpus 8
@@ -23,44 +23,46 @@ models:
     model_path: Qwen/Qwen2-Audio-7B-Instruct
     torch_dtype: bfloat16
 
+# The `release` loader works for every tier of the public dataset release:
+# point data_dir at the tier directory containing metadata.jsonl.
 datasets:
-  - name: tier1
-    data_dir: /path/to/Audio2ToolDataset/public/tier1_direct
+  - name: release
+    data_dir: ./data/Audio2Tool/public/tier1_direct
     max_samples: null      # set to a small number (e.g. 10) for a quick test
     speakers_per_query: 1
 
-  # - name: tier2
-  #   data_dir: /path/to/Audio2ToolDataset/public/tier2_parametric
+  # - name: release
+  #   data_dir: ./data/Audio2Tool/public/tier2_parametric
   #   max_samples: null
   #   speakers_per_query: 1
 
-  # - name: tier3
-  #   data_dir: /path/to/Audio2ToolDataset/public/tier3_multi_intent
+  # - name: release
+  #   data_dir: ./data/Audio2Tool/public/tier3_multi_intent
   #   max_samples: null
   #   speakers_per_query: 1
 
-  # - name: tier4
-  #   data_dir: /path/to/Audio2ToolDataset/public/tier4_implicit
+  # - name: release
+  #   data_dir: ./data/Audio2Tool/public/tier4_implicit
   #   max_samples: null
   #   speakers_per_query: 1
 
-  # - name: tier5
-  #   data_dir: /path/to/Audio2ToolDataset/public/tier5_needle
+  # - name: release
+  #   data_dir: ./data/Audio2Tool/public/tier5_needle
   #   max_samples: null
   #   speakers_per_query: 1
 
-  # - name: tier6
-  #   data_dir: /path/to/Audio2ToolDataset/public/tier6_correction
+  # - name: release
+  #   data_dir: ./data/Audio2Tool/public/tier6_correction
   #   max_samples: null
   #   speakers_per_query: 1
 
-  # - name: tier7
-  #   data_dir: /path/to/Audio2ToolDataset/public/tier7_multiturn
+  # - name: release
+  #   data_dir: ./data/Audio2Tool/public/tier7_multiturn
   #   max_samples: null
   #   speakers_per_query: 1
 
-  # - name: tier8
-  #   data_dir: /path/to/Audio2ToolDataset/public/tier8_intent_blending
+  # - name: release
+  #   data_dir: ./data/Audio2Tool/public/tier8_intent_blending
   #   max_samples: null
   #   speakers_per_query: 1
 
@@ -80,7 +82,7 @@ temperature: 1.0
 seed: 42
 
 # Tools taxonomy CSV (loaded at runtime, injected into system prompt + OpenAI tools)
-tools_file: /path/to/Audio2ToolDataset/tools_registry.csv
+tools_file: ./data/Audio2Tool/tools_registry.csv
 
 system_prompt: |
   You are an AI assistant that converts voice commands into tool calls.
